@@ -1,18 +1,20 @@
 from fastapi import FastAPI
 
-from src.config import settings
-from src.http_client import AVClient
+from src.http_client import av_client
 
 app = FastAPI()
 
-av_client = AVClient(base_url='https://www.alphavantage.co', api_key=settings.api_key)
+
+@app.get('/')
+def root_message():
+    return {'message': 'API is working!'}
 
 
-@app.get("/trades/intraday")
-async def get_intraday_trades():
-    return await av_client.get_intraday_trades()
+@app.get('/ticker/search/{keyword}')
+async def get_ticker(keyword: str):
+    return await av_client.search_ticker_by_keyword(keyword)
 
 
-@app.get("/trades/daily")
-async def get_daily_trades():
-    return await av_client.get_daily_trades()
+@app.get("/trade/daily/{company}")
+async def get_daily_trades(company: str):
+    return await av_client.get_daily_trades(symbol=company)

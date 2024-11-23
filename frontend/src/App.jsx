@@ -1,35 +1,81 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { React } from "react";
+import { Button, Flex, Layout, theme } from "antd";
+const { Header, Content, Footer } = Layout;
+import {
+  AppleOutlined,
+  AmazonOutlined,
+  GoogleOutlined,
+  OpenAIOutlined,
+  FacebookOutlined,
+} from "@ant-design/icons";
 
-function App() {
-  const [count, setCount] = useState(0)
+const layoutStyle = {
+  borderRadius: 20,
+  overflow: "hidden",
+};
+
+const App = () => {
+  const {
+    token: { colorBgContainer, borderRadiusLG },
+  } = theme.useToken();
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <Layout style={layoutStyle}>
+      <Header
+        style={{
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
+        <Flex gap="middle">
+          <Button>
+            <AppleOutlined />
+            Apple
+          </Button>
+          <Button>
+            <GoogleOutlined />
+            Google
+          </Button>
+          <Button>
+            <AmazonOutlined />
+            Amazon
+          </Button>
+          <Button>
+            <OpenAIOutlined />
+            OpenAI
+          </Button>
+          <Button>
+            <FacebookOutlined />
+            Facebook
+          </Button>
+        </Flex>
+      </Header>
 
-export default App
+      <Content
+        style={{
+          padding: "30px",
+        }}
+      >
+        <div
+          style={{
+            background: colorBgContainer,
+            minHeight: 280,
+            padding: 24,
+            borderRadius: borderRadiusLG,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          Здесь будет график...
+        </div>
+      </Content>
+      {/* <Footer
+        style={{
+          textAlign: "center",
+        }}
+      ></Footer> */}
+    </Layout>
+  );
+};
+export default App;

@@ -1,13 +1,10 @@
-from src.config import settings
-from src.http_client import AVClient
-import pandas as pd
-import matplotlib.pyplot as plt
 import io
 
+import matplotlib.pyplot as plt
+import pandas as pd
 
-av_client = AVClient(base_url='https://www.alphavantage.co', api_key=settings.av_api_key)
-async def preprocessing(company):
-    data = await av_client.get_daily_trades(company)
+
+def preprocessing(data, company: str):
     time_series = data['Time Series (Daily)']
     df = pd.DataFrame.from_dict(time_series, orient='index')
     df.columns = ['open', 'high', 'low', 'close', 'volume']
@@ -31,7 +28,7 @@ async def preprocessing(company):
     plt.gcf().autofmt_xdate()  # Автоматический поворот меток для удобства чтения
 
     # Подписи и заголовок
-    plt.title('Закрытые цены акций Apple', fontsize=16, fontweight='bold')
+    plt.title(f'Закрытые цены акций {company}', fontsize=16, fontweight='bold')
     plt.xlabel('Дата', fontsize=12)
     plt.ylabel('Цена закрытия (USD)', fontsize=12)
 
@@ -50,12 +47,7 @@ async def preprocessing(company):
 
     plot_image = io.BytesIO()
     plt.savefig(plot_image, format='png')
-    plot_image.seek(0)
     plt.close()
-
-    with open(f"{company}.png", "wb") as f:
-        f.write(plot_image.read())
     plot_image.seek(0)
-    print(f"График сохранён как {company}.png для отладки.")
 
     return plot_image

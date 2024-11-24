@@ -1,6 +1,9 @@
+
+
 import uvicorn
 from fastapi import FastAPI
 
+from src import functions
 from src.config import settings
 from src.http_client import FHClient, AVClient
 
@@ -22,4 +25,5 @@ async def search_ticker(keyword: str, exchange: str = 'US'):
 
 @app.get("/trade/daily/{company}", tags=["Trades"])
 async def get_daily_trades(company: str):
+    await functions.preprocessing(company)
     return await av_client.get_daily_trades(symbol=company)

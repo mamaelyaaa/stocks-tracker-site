@@ -1,13 +1,11 @@
 import { React } from "react";
-import { Button, Flex, Layout, theme } from "antd";
+import { Button, Input, Layout, theme, FloatButton } from "antd";
+// import TelegramIcon from "./assets/telegram.svg";
+import TickerButtons from "./components/TickerButtons.jsx";
+
+import { GithubOutlined } from "@ant-design/icons";
+
 const { Header, Content, Footer } = Layout;
-import {
-  AppleOutlined,
-  AmazonOutlined,
-  GoogleOutlined,
-  OpenAIOutlined,
-  FacebookOutlined,
-} from "@ant-design/icons";
 
 const layoutStyle = {
   borderRadius: 20,
@@ -25,30 +23,11 @@ const App = () => {
         style={{
           display: "flex",
           alignItems: "center",
+          backgroundColor: "#4CAF50", // Зеленый цвет (hex)
+          color: "#ffffff", // Контрастный белый текст'
         }}
       >
-        <Flex gap="middle">
-          <Button>
-            <AppleOutlined />
-            Apple
-          </Button>
-          <Button>
-            <GoogleOutlined />
-            Google
-          </Button>
-          <Button>
-            <AmazonOutlined />
-            Amazon
-          </Button>
-          <Button>
-            <OpenAIOutlined />
-            OpenAI
-          </Button>
-          <Button>
-            <FacebookOutlined />
-            Facebook
-          </Button>
-        </Flex>
+        <TickerButtons />
       </Header>
 
       <Content
@@ -60,7 +39,7 @@ const App = () => {
           style={{
             background: colorBgContainer,
             minHeight: 280,
-            padding: 24,
+            // padding: 24,
             borderRadius: borderRadiusLG,
             display: "flex",
             alignItems: "center",
@@ -70,11 +49,25 @@ const App = () => {
           Здесь будет график...
         </div>
       </Content>
-      {/* <Footer
+      <Footer
         style={{
           textAlign: "center",
         }}
-      ></Footer> */}
+      >
+        <Button
+          target="_blank"
+          href="https://t.me/ShmokiTraderBot"
+          type="primary"
+        >
+          Telegram Bot
+        </Button>
+      </Footer>
+
+      <FloatButton
+        href="https://github.com/mamaelyaaa/trader-site"
+        target="_blank"
+        icon={<GithubOutlined />}
+      />
     </Layout>
   );
 };

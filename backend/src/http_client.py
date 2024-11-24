@@ -1,7 +1,7 @@
 from typing import Optional
 
 from aiohttp import ClientSession
-
+from async_lru import alru_cache
 
 class HTTPClient:
 
@@ -17,19 +17,22 @@ class HTTPClient:
 
 class AVClient(HTTPClient):
 
+    @alru_cache
     async def get_daily_trades(self, symbol: str):
         self._av_params.update({
             "function": "TIME_SERIES_DAILY",
             "symbol": symbol,
         })
-
         async with self._session.get(url='/query', params=self._av_params) as resp:
+            if resp.status == 500:
+                raise Exception("Такой компании не существует")
             res = resp.json()
             return await res
 
 
 class FHClient(HTTPClient):
 
+    @alru_cache
     async def search_ticker_by_keyword(self, q: str, exchange: Optional[str] = "US"):
         async with self._session.get(url='search', params={'q': q, 'exchange': exchange}) as resp:
             return await resp.json()

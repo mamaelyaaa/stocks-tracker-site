@@ -50,8 +50,6 @@ def preprocessing(data, company: str):
     plt.close()
     plot_image.seek(0)
 
-    # r.set(f'{company}-png', plot_image.read())
-
     with open(f"src/graphic/{company}.png", "wb") as f:
         f.write(plot_image.read())
     plot_image.seek(0)

@@ -25,8 +25,6 @@ class AVClient(HTTPClient):
             "symbol": symbol,
         })
 
-        # На этом этапе происходит проверка есть ли в Редисе график
-
         async with self._session.get(url='/query', params=self._av_params) as resp:
             res = resp.json()
             return await res

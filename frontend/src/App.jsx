@@ -85,7 +85,7 @@ const App = () => {
           </div>
         </Header>
 
-        <Content className="p-8"> 
+        <Content className="p-8">
           <div
             className="flex items-center justify-center"
             style={{
@@ -93,22 +93,22 @@ const App = () => {
               borderRadius: borderRadiusLG,
               minHeight: "100%",
               minWidth: "100%",
-              padding: '5px',
+              padding: "5px",
               height: "500px",
               width: "800px",
             }}
           >
             {loading ? (
-              <Spin size="large"/>
+              <Spin size="large" />
             ) : chart ? (
               <img
                 className="max-w-full max-h-full rounded-lg object-contain"
                 src={chart}
                 alt="График компании"
                 style={{
-                  maxWidth: "100%", 
-                  maxHeight: "100%", 
-                  // objectFit: "contain", 
+                  maxWidth: "100%",
+                  maxHeight: "100%",
+                  // objectFit: "contain",
                 }}
               />
             ) : (

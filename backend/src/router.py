@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from starlette.responses import StreamingResponse
 
 from src.config import settings
@@ -17,7 +17,11 @@ async def search_ticker(keyword: str, exchange: str = 'US'):
 
 
 @router.get("/trade/daily/{company}", tags=["Trades"])
-async def get_daily_trades(company: str = 'IBM'):
-    data = await av_client.get_daily_trades(company)
+async def get_daily_trades(company: str):
+    data = await av_client.get_daily_trades(company.upper())
+
+    if 'Information' in data:
+        return HTTPException(status_code=503, detail='Превышен лимит запросов на AlphaVantage')
+
     filepath = preprocessing(data, company)
     return StreamingResponse(filepath, media_type='image/png')

@@ -3,6 +3,7 @@ from typing import Optional
 from aiohttp import ClientSession
 from async_lru import alru_cache
 
+
 class HTTPClient:
 
     def __init__(self, base_url: str, api_key: str):
@@ -23,9 +24,10 @@ class AVClient(HTTPClient):
             "function": "TIME_SERIES_DAILY",
             "symbol": symbol,
         })
+
+        # На этом этапе происходит проверка есть ли в Редисе график
+
         async with self._session.get(url='/query', params=self._av_params) as resp:
-            if resp.status == 500:
-                raise Exception("Такой компании не существует")
             res = resp.json()
             return await res
 

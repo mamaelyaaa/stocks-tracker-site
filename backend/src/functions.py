@@ -28,7 +28,7 @@ def preprocessing(data, company: str):
     plt.gcf().autofmt_xdate()  # Автоматический поворот меток для удобства чтения
 
     # Подписи и заголовок
-    plt.title(f'Закрытые цены акций {company}', fontsize=16, fontweight='bold')
+    plt.title(f'Закрытые цены акций {company.upper()}', fontsize=16, fontweight='bold')
     plt.xlabel('Дата', fontsize=12)
     plt.ylabel('Цена закрытия (USD)', fontsize=12)
 
@@ -48,6 +48,12 @@ def preprocessing(data, company: str):
     plot_image = io.BytesIO()
     plt.savefig(plot_image, format='png')
     plt.close()
+    plot_image.seek(0)
+
+    # r.set(f'{company}-png', plot_image.read())
+
+    with open(f"src/graphic/{company}.png", "wb") as f:
+        f.write(plot_image.read())
     plot_image.seek(0)
 
     return plot_image

@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from starlette.responses import StreamingResponse
 
 from src.config import settings
-from src.functions import preprocessing
+from src.functions import createGraphic
 from src.http_client import FHClient, AVClient
 
 fhub_client = FHClient(base_url='https://finnhub.io/api/v1/', api_key=settings.fh_api_key)
@@ -23,5 +23,5 @@ async def get_daily_trades(company: str):
     if 'Information' in data:
         return HTTPException(status_code=503, detail='Превышен лимит запросов на AlphaVantage')
 
-    filepath = preprocessing(data, company)
+    filepath = createGraphic(data, company)
     return StreamingResponse(filepath, media_type='image/png')

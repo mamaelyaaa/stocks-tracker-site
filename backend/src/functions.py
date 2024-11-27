@@ -1,10 +1,11 @@
+from pydantic import json
 import io
 
 import matplotlib.pyplot as plt
 import pandas as pd
 
 
-def preprocessing(data, company: str):
+def createGraphic(data: json, company: str):
     time_series = data['Time Series (Daily)']
     df = pd.DataFrame.from_dict(time_series, orient='index')
     df.columns = ['open', 'high', 'low', 'close', 'volume']

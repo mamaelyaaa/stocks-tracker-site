@@ -1,6 +1,6 @@
-import { React, useState, useRef } from "react";
-import { Link } from "react-router-dom";
+import { React, useState, useRef, useCallback } from "react";
 import axios from "axios";
+import debounce from "lodash.debounce";
 import {
   Button,
   Flex,
@@ -11,6 +11,7 @@ import {
   Spin,
   Card,
   Tour,
+  AutoComplete,
 } from "antd";
 
 import {
@@ -21,14 +22,12 @@ import {
   WindowsOutlined,
   GithubOutlined,
   SendOutlined,
-  InfoCircleOutlined,
-  AreaChartOutlined,
+  QuestionCircleOutlined,
 } from "@ant-design/icons";
 
 const { Header, Content, Footer } = Layout;
-const { Search } = Input;
 
-function Home() {
+const Home = () => {
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
@@ -45,6 +44,12 @@ function Home() {
       title: "Выберите кампанию",
       description: "Нажмите на интересующую вас кампанию из этих 5 или...",
       target: () => ref1.current,
+    },
+    {
+      title: "Используйте поиск",
+      description:
+        "Поиск определит какую кампанию вы имеете в виду и построит график по ней",
+      target: () => ref2.current,
     },
   ];
 
@@ -70,18 +75,82 @@ function Home() {
     fetchChart(id);
   };
 
-  return (
-    <div className="flex m-0 justify-center items-center">
-      <Layout className="overflow-auto rounded-3xl">
-        <Header className="flex items-center justify-center gap-3 bg-green-500">
-          <Button>
-            <Link className="flex text-white gap-2 " to={{ pathname: "/" }}>
-              Home
-              <AreaChartOutlined />
-            </Link>
-          </Button>
+  const SearchButton = () => {
+    const [options, setOptions] = useState([]);
+    const [loading, setLoading] = useState(false);
 
-          <Search placeholder="Поиск..." />
+    const fetchSuggestions = async (query) => {
+      try {
+        const response = await axios.get(
+          `http://127.0.0.1:8000/search/${query}?exchange=US`
+        );
+        setOptions(
+          response.data.map((item) => ({
+            value: item.symbol,
+            label: (
+              <div>
+                {item.symbol}
+                <span style={{ marginLeft: 10, color: "gray" }}>
+                  {item.description}
+                </span>
+              </div>
+            ),
+          }))
+        );
+      } catch (error) {
+        console.error("Ошибка загрузки данных:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    // Дебаунсинг функции поиска
+    const debouncedFetchSuggestions = useCallback(
+      debounce((query) => {
+        if (query.length > 3) {
+          fetchSuggestions(query);
+        } else {
+          setOptions([]); // Очистка списка, если символов меньше 4
+        }
+      }, 500),
+      [] // Депенденси массив пуст, чтобы debounce не пересоздавался
+    );
+
+    const handleSearch = (value) => {
+      debouncedFetchSuggestions(value.trim()); // Убираем лишние пробелы
+    };
+
+    const handleSelect = (value) => {
+      console.log("Выбранный символ:", value);
+    };
+
+    const onClick = (id) => {
+      fetchChart(id);
+    };
+
+    return (
+      <>
+        <AutoComplete
+          className="w-48"
+          options={options}
+          onSelect={handleSelect}
+          onSearch={handleSearch}
+          placeholder="Поиск..."
+          notFoundContent={loading ? "Загрузка..." : "Ничего не найдено"}
+        >
+          <Input.Search onSearch={onClick}></Input.Search>
+        </AutoComplete>
+      </>
+    );
+  };
+
+  return (
+    <div className="flex h-screen w-screen">
+      <Layout>
+        <Header className="flex items-center justify-center gap-3 bg-gradient-to-r from-green-500 to-slate-400">
+          <div ref={ref2} className="flex">
+            <SearchButton></SearchButton>
+          </div>
           <div className="flex gap-3" ref={ref1}>
             <Button onClick={() => onClickChart("AAPL")}>
               <AppleOutlined />
@@ -104,49 +173,42 @@ function Home() {
               Tesla
             </Button>
           </div>
+          <Button shape="circle" onClick={() => setOpen(true)}>
+            <QuestionCircleOutlined />
+          </Button>
         </Header>
 
-        <Content className="p-8">
-          <div
-            className="flex items-center justify-center min-w-full min-h-full p-1.5 w-auto"
-            style={{
-              background: colorBgContainer,
-              borderRadius: borderRadiusLG,
-              height: "500px",
-            }}
-          >
-            {loading ? (
-              <Spin size="large" />
-            ) : chart ? (
+        <Content className="p-8 flex items-center justify-center">
+          {loading ? (
+            <Spin size="large" />
+          ) : chart ? (
+            <div
+              className="flex items-center justify-center min-w-full min-h-full p-1.5 w-auto"
+              style={{
+                background: colorBgContainer,
+                borderRadius: borderRadiusLG,
+                height: "500px",
+                width: "800px",
+              }}
+            >
               <img
                 className="max-w-full max-h-full rounded-lg object-contain"
                 src={chart}
                 alt="График компании"
-                style={
-                  {
-                    // maxWidth: "100%",
-                    // maxHeight: "100%",
-                    // objectFit: "contain",
-                  }
-                }
               />
-            ) : (
-              <Card
-                size="default"
-                className="border-gray-300"
-                title={
-                  <h1 className="font-medium gap-4 flex">Stocks Tracker</h1>
-                }
-              >
-                <p>Card content</p>
-                <p>Card content</p>
-                <p>Card content</p>
+            </div>
+          ) : (
+            <div className="flex items-center">
+              <Card hoverable className="border-gray-300">
+                <Flex>
+                  <h1 className="font-medium text-center">Трекер Акций</h1>
+                </Flex>
               </Card>
-            )}
-          </div>
+            </div>
+          )}
         </Content>
 
-        <Footer className='flex justify-center'>
+        <Footer className="flex justify-center">
           <Button
             target="_blank"
             href="https://t.me/ShmokiTraderBot"
@@ -154,10 +216,6 @@ function Home() {
             icon={<SendOutlined />}
           >
             Telegram Bot
-          </Button>
-          <Button onClick={() => setOpen(true)}>
-            <InfoCircleOutlined />
-            Что делать?
           </Button>
         </Footer>
       </Layout>
@@ -179,5 +237,6 @@ function Home() {
       />
     </div>
   );
-}
+};
+
 export default Home;

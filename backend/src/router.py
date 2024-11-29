@@ -13,7 +13,8 @@ router = APIRouter()
 
 @router.get('/search/{keyword}', tags=["Search"])
 async def search_ticker(keyword: str, exchange: str = 'US'):
-    return await fhub_client.search_ticker_by_keyword(keyword, exchange)
+    data = await fhub_client.search_ticker_by_keyword(keyword, exchange)
+    return data['result'][:4]
 
 
 @router.get("/trade/daily/{company}", tags=["Trades"])

@@ -1,10 +1,11 @@
+from abc import ABC, abstractmethod
 from typing import Optional
 
 from aiohttp import ClientSession
 from async_lru import alru_cache
 
 
-class HTTPClient:
+class HTTPClient(ABC):
 
     def __init__(self, base_url: str, api_key: str):
         self._session = ClientSession(
@@ -15,8 +16,16 @@ class HTTPClient:
         )
         self._av_params = {'apikey': api_key}
 
+    @abstractmethod
+    async def close_session(self):
+        pass
+
 
 class AVClient(HTTPClient):
+
+    async def close_session(self):
+        print('Closing AlphaVantage session...')
+        await self._session.close()
 
     @alru_cache
     async def get_daily_trades(self, symbol: str):
@@ -31,6 +40,10 @@ class AVClient(HTTPClient):
 
 
 class FHClient(HTTPClient):
+
+    async def close_session(self):
+        print('Closing FinnHub session...')
+        await self._session.close()
 
     @alru_cache
     async def search_ticker_by_keyword(self, q: str, exchange: Optional[str] = "US"):

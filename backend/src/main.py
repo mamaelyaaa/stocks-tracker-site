@@ -1,13 +1,9 @@
-import uvicorn
 from fastapi import FastAPI
+from starlette.middleware.cors import CORSMiddleware
 
-from src.config import settings
-from src.http_client import FHClient, AVClient
+from src.router import router, av_client, fhub_client
 
 app = FastAPI()
-
-fhub_client = FHClient(base_url='https://finnhub.io/api/v1/', api_key=settings.fh_api_key)
-av_client = AVClient(base_url='https://www.alphavantage.co', api_key=settings.av_api_key)
 
 
 @app.get('/')
@@ -15,11 +11,23 @@ def root_message():
     return {'message': 'API is working!'}
 
 
-@app.get('/search/{keyword}')
-async def search_ticker(keyword: str, exchange: str = 'US'):
-    return await fhub_client.search_ticker_by_keyword(keyword, exchange)
+@app.on_event("shutdown")
+async def shutdown():
+    await av_client.close_session()
+    await fhub_client.close_session()
 
 
-@app.get("/trade/daily/{company}", tags=["Trades"])
-async def get_daily_trades(company: str):
-    return await av_client.get_daily_trades(symbol=company)
+app.include_router(router)
+
+origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)

@@ -1,3 +1,5 @@
+import csv
+
 from pydantic import json
 import io
 
@@ -56,3 +58,14 @@ def createGraphic(data: json, company: str):
     plot_image.seek(0)
 
     return plot_image
+
+def createCSV(data: json):
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["Date", "Open", "High", "Low", "Close", "Volume"])
+    for date, values in data["Time Series (Daily)"].items():
+        writer.writerow(
+            [date, values["1. open"], values["2. high"], values["3. low"], values["4. close"], values["5. volume"]])
+
+    output.seek(0)
+    return output

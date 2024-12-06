@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from fastapi import HTTPException
 from typing import Optional
 
 from aiohttp import ClientSession
